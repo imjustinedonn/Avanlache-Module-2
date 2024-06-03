@@ -16,7 +16,9 @@ const PRICES = {
 function MusicServices() {
   const [selectedService, setSelectedService] = useState(ServiceType.NONE);
   const [price, setPrice] = useState(null);
-  const [isMetaMaskConnected, setIsMetaMaskConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState('');//dito papakita yung address sa metamask
+  const [errorMessage, setErrorMessage] = useState(''); // dito kapag wala kang metamask dito yung error
+  const [message, setMessage] = useState('');//dito yung message ng presyo and transation succesfully
 
   const handleServiceChange = (event) => {
     const service = parseInt(event.target.value, 10);
@@ -31,25 +33,37 @@ function MusicServices() {
     }
   };
 
+  //ITO YUNG CONNECTION NG METAMASK
   const connectToMetaMask = async () => {
-    try {
-      
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      
-      setIsMetaMaskConnected(true);
-    } catch (error) {
-      console.error(error);
-      alert('Failed to connect to MetaMask. Please make sure MetaMask is installed and unlocked.');
+    if (window.ethereum) {
+      try {
+        // Request access to MetaMask wallet
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        // Get the connected wallet address
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          setWalletAddress(accounts[0]);
+        } else {
+          setErrorMessage('No account found. Please make sure you have a wallet connected.');
+        }
+        
+      } catch (error) {
+        console.error('Error connecting to MetaMask:', error);
+      }
+    } else {
+      setErrorMessage('MetaMask is not installed. Please install MetaMask to use this feature.');
     }
   };
+  //GANG DITO
 
   const handleTransaction = async () => {
-    if (!isMetaMaskConnected) {
-      alert('Please connect to MetaMask first.');
-      return;
+    if(walletAddress != ""){
+      alert('Transaction completed successfully!');
+      setMessage("Price: "+ price + " pesos! Transaction successfully!");
+    }else{
+      alert('Connect MetaMask First!');
     }
-
-    alert('Transaction completed successfully!');
   };
 
   return (
@@ -69,23 +83,36 @@ function MusicServices() {
         <div className="result-group">
           <label>Price: <span>{price} pesos</span></label>
           <button onClick={handleTransaction}>Purchase</button>
+          <p><span>{message}</span> </p>
         </div>
       )}
-      {!isMetaMaskConnected && (
+        // DITO
         <div className="connect-group">
-          <button onClick={connectToMetaMask}>Connect to MetaMask</button>
+          <br/><button onClick={connectToMetaMask}>Connect to MetaMask</button>
+          {walletAddress && (
+        <div>
+          <p>Connected Wallet Address:</p>
+          <p>{walletAddress}</p>
         </div>
-      )}
+        )}
+          {errorMessage && <p>{errorMessage}</p>}
+        </div>
+
+        // GANG DITO
 
       <style jsx>{`
         .container {
           background-color: #e4e4e4;
           text-align: center;
-          margin-top: 50px;
+          margin-top: 250px;
           font-family: Arial, sans-serif;
           padding-bottom: 50px;
           border: 2pt solid black;
           border-radius: 20pt;
+          margin-left: auto;
+          margin-right: auto;
+          width: fit-content;
+          padding: 20pt;
         }
         .input-group {
           margin-bottom: 20px;

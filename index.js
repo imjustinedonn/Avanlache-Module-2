@@ -16,9 +16,9 @@ const PRICES = {
 function MusicServices() {
   const [selectedService, setSelectedService] = useState(ServiceType.NONE);
   const [price, setPrice] = useState(null);
-  const [walletAddress, setWalletAddress] = useState('');//dito papakita yung address sa metamask
-  const [errorMessage, setErrorMessage] = useState(''); // dito kapag wala kang metamask dito yung error
-  const [message, setMessage] = useState('');//dito yung message ng presyo and transation succesfully
+  const [walletAddress, setWalletAddress] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleServiceChange = (event) => {
     const service = parseInt(event.target.value, 10);
@@ -33,14 +33,10 @@ function MusicServices() {
     }
   };
 
-  //ITO YUNG CONNECTION NG METAMASK
   const connectToMetaMask = async () => {
     if (window.ethereum) {
       try {
-        // Request access to MetaMask wallet
         await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-        // Get the connected wallet address
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         if (accounts.length > 0) {
           setWalletAddress(accounts[0]);
@@ -55,7 +51,6 @@ function MusicServices() {
       setErrorMessage('MetaMask is not installed. Please install MetaMask to use this feature.');
     }
   };
-  //GANG DITO
 
   const handleTransaction = async () => {
     if(walletAddress != ""){
@@ -86,7 +81,7 @@ function MusicServices() {
           <p><span>{message}</span> </p>
         </div>
       )}
-        // DITO
+
         <div className="connect-group">
           <br/><button onClick={connectToMetaMask}>Connect to MetaMask</button>
           {walletAddress && (
@@ -97,8 +92,6 @@ function MusicServices() {
         )}
           {errorMessage && <p>{errorMessage}</p>}
         </div>
-
-        // GANG DITO
 
       <style jsx>{`
         .container {
